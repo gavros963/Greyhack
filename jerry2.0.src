@@ -1,0 +1,229 @@
+meta = include_lib("/lib/metaxploit.so")
+crypto = include_lib("/lib/crypto.so")
+if not meta then exit("metaxploit.so not in /lib")
+if not crypto then exit("crypto.so not in /lib")
+hostShell = get_shell
+librarysrc = hostShell.host_computer.File("/bin/library.src")
+if not librarysrc then exit("Library.src missing in /bin")
+
+
+library_query = get_custom_object
+
+findFile = function(fileObject, path)
+    inputFolders = path.split("/")[:-1]
+    inputFile = path.split("/")[-1]
+    while fileObject.parent
+        fileObject = fileObject.parent
+    end while
+    if path == "/" then return fileObject
+    for inputFolder in inputFolders
+        for folder in fileObject.get_folders
+            if folder.name == inputFolder then
+                fileObject = folder
+                break
+            end if
+        end for
+    end for
+    for file in fileObject.get_folders+fileObject.get_files
+        if file.name == inputFile then return file
+    end for
+end function
+userCheck = function(fileObject) //check perm for npc machine
+    if not fileObject then; return "*guest"; end if
+    while fileObject.parent
+        fileObject = fileObject.parent
+    end while
+    homeFolder = null
+    for folder in fileObject.get_folders
+        if folder.name == "root" then
+            if folder.has_permission("w") and folder.has_permission("r") and folder.has_permission("x") then return "root"
+        end if
+        if folder.name == "home" then
+            homeFolder = folder
+        end if
+    end for
+    if not homeFolder then return "guest"
+    for folder in homeFolder.get_folders
+        if folder.name == "guest" then continue
+        if folder.chmod("u+rwx") == "" then
+            if folder.owner == folder.group then return folder.owner
+            return "*"+folder.group
+        end if
+    end for
+    return "guest"
+end function
+get_random_ip = function()
+    while true
+        ip = floor((rnd * 255) + 1) + "." + floor((rnd * 255) + 1) + "." + floor((rnd * 255) + 1) + "." + floor((rnd * 255) + 1)
+        if not is_valid_ip(ip) then continue
+        if is_lan_ip(ip) then continue
+        return ip
+    end while
+end function
+
+execute = function(map)		// executes the final payload.
+	memory = map.memory
+	values = map.values
+	objectTypes = map.objectTypes
+	privilage = map.privilage
+	objects = []
+	for mem in memory
+		index = memory.indexOf(mem)
+		if user == "root" and objectTypes[index] == "shell" then
+			object = metalib.overflow(mem, values[index], device)
+			rootShell = object
+			hostShell.scp("/lib/metaxploit.so", "/lib", rootShell)
+			hostShell.scp("/lib/crypto.so", "/lib", rootShell)
+			hostShell.scp("/bin/library.src", "/bin", rootShell)
+			hostShell.scp("/bin/jerry", "/bin", rootShell)
+			rootShell.launch("/bin/jerry")
+			exit()
+		end if
+	end for
+	for mem in memory
+		index = memory.indexOf(mem)
+		object = metalib.overflow(mem, values[index], device)
+		objects.push(object)
+		if objectTypes[index] == "file" or objectTypes[index] == "computer" and privilage[index] != "guest" then
+			if objectTypes[index] == "computer" then
+				passwd = object.File("/etc/passwd")
+			else
+				passwd = findFile(object, "/etc/passwd")
+			end if
+			if passwd.get_content == "" then
+				passwd = null
+			end if
+			if passwd and guestshell then
+				object = objects[guestshell]
+				passwd = passwd.get_content
+				rootpass = passwd[":":char(10)]
+				print("deciphering root password")
+				cracked = crypto.decipher(rootpass)
+				pc = object.host_computer
+				maker = pc.touch("/home/guest", "cheese.src")
+				if typeof(maker) != "string" then
+					file = pc.File("/home/guest/cheese.src")
+					interupt = get_custom_object
+					file.set_content("interupt = get_custom_object ; cracked = "+cracked+" ; interupt.gshell = get_shell(""root"", ""cracked"")")
+					object.build("/home/guest/cheese.src", "/home/guest")
+					if pc.File("/home/guest/cheese") then
+						object.launch("/home/guest/cheese")
+						rootShell = interupt.gshell
+						hostShell.scp("/lib/metaxploit.so", "/lib", rootShell)
+						hostShell.scp("/lib/crypto.so", "/lib", rootShell)
+						hostShell.scp("/bin/library.src", "/bin", rootShell)
+						hostShell.scp("/bin/jerry", "/bin", rootShell)
+						print("launching deployed mouse")
+						rootShell.launch("/bin/jerry")
+						exit()
+					end if
+				end if
+			end if
+		else if objectTypes[index] == "shell" and privilage[index] == "guest" then
+			if passwd then
+				passwd = passwd.get_content
+				rootpass = passwd[":":"\n"]
+				print("deciphering root password")
+				cracked = crypto.decipher(rootpass)
+				pc = object.host_computer
+				maker = pc.touch("/home/guest", "cheese.src")
+				if typeof(maker) != "string" then
+					file = pc.File("/home/guest/cheese.src")
+					interupt = get_custom_object
+					file.set_content("interupt = get_custom_object ; cracked = "+cracked+" ; interupt.gshell = get_shell(""root"", ""cracked"")")
+					object.build("/home/guest/cheese.src", "/home/guest")
+					if pc.File("/home/guest/cheese") then
+						object.launch("/home/guest/cheese")
+						rootShell = interupt.gshell
+						hostShell.scp("/lib/metaxploit.so", "/lib", rootShell)
+						hostShell.scp("/lib/crypto.so", "/lib", rootShell)
+						hostShell.scp("/bin/library.src", "/bin", rootShell)
+						hostShell.scp("/bin/jerry", "/bin", rootShell)
+						rootShell.launch("/bin/jerry")
+						exit()
+					end if
+				end if
+			end if
+			guestshell = index
+		end if
+	end for
+	guestshell = null
+	passwd = null
+end function
+target = null
+router = null
+passwd = null
+guestshell = null
+library_query.output = null
+
+
+while true
+	builder = hostShell.build("/bin/library.src", "/bin")
+	if not hostShell.host_computer.File("/bin/library") then exit("Library not built")
+	while target == null
+		while router == null
+			ip = get_random_ip
+			print("attempting conection to "+ip)
+			router = get_router(ip)
+		end while
+		routerVersion = router.kernel_version
+		print("accessing router with kernel version "+routerVersion)
+		target = meta.net_use(ip, 0)
+	end while
+	device = router.devices_lan_ip[0]
+	metalib = target.dump_lib
+	library_query.ver = routerVersion
+	hostShell.launch("/bin/library")
+	print("checking against library...")
+	if library_query.output != null then
+		print("Found!")
+		output = library_query.output
+		execute(output)
+		target = null
+		router = null
+		library_query.output = null
+		guestshell = null
+		passwd = null
+		continue
+	end if
+	print("Version not found in library, beginning scan")
+	memory = meta.scan(metalib)
+	values = []
+	objects = []
+	objectTypes = []
+	privilage = []
+
+	for mem in memory
+		value = meta.scan_address(metalib, mem)
+		value = value[value.indexOf("<b>")+3:value.indexOf("</b>")]
+		values.push(value)
+	end for
+	for mem in memory
+		index = memory.indexOf(mem)
+		object = metalib.overflow(mem, values[index], device)
+		print
+		objectType = typeof(object)
+		objectTypes.push(objectType)
+		if objectType == "file" then
+			user = userCheck(object)
+		else if objectType == "computer" then
+			user = userCheck(object.File("/var"))
+		else if objectType == "shell" then
+			user = userCheck(object.host_computer.File("/var"))
+		else
+			user = null
+		end if
+		objects.push(object)
+		privilage.push(user)
+	end for
+	print("updating library")
+	library_content = librarysrc.get_content
+	librarysrc.set_content(library_content+char(10)+"lib = {""memory"":"+memory+", ""values"":"+values+", ""objectTypes"":"+objectTypes+", ""privilage"":"+privilage+"}"+char(10)+"if libver == "+char(34)+routerVersion+char(34)+" then"+char(10)+"library_query.output = lib"+char(10)+"end if")
+	result = {"memory":memory, "values":values, "objectTypes":objectTypes, "privilage":privilage}
+	execute(result)
+	target = null
+	router = null
+	library_query.output = null
+	guestshell = null
+	passwd = null
+end while
