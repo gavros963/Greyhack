@@ -1,0 +1,189 @@
+listpars = function(input)
+    output = []
+    while input.len != 0
+        x = input.pull
+        if x == char(91) then
+            nlist = []
+            while x != char(93)
+                if input[0] == char(123) then
+                    input = mappars(input)
+                else if input[0] == char(91) then
+                    input = listpars(input)
+                end if
+                x = input.pull
+                if x != char(44) and x != char(93) then
+                    nlist.push(x)
+                end if
+            end while
+            output.push(nlist)
+        else
+            output.push(x)
+        end if
+    end while
+    return output
+end function
+
+
+mappars = function(input)
+    output = []
+    while input.len != 0
+        x = input.pull
+        if x == char(123) then
+            nmap = {}
+            while x != char(125)
+                x = input.pull
+                if x == char(125) then break
+                if input[0] == char(58) then
+                    input.pull
+                    if input[0] == char(91) then
+                        input = listpars(input)
+                        y = input.pull
+                    else if input[0] == char(123) then
+                        input = mappars(input)
+                        y = input.pull
+                    else
+                        y = input.pull
+                    end if
+                    z = {x:y}
+                    nmap = nmap+z
+                end if
+                if input.len == 0 then break
+            end while
+            output.push(nmap)
+        else
+            output.push(x)
+        end if
+        if input.len == 0 then break
+    end while
+    if output.len == 1 then
+        return output[0]
+    else
+        return output
+    end if
+end function
+                
+
+
+
+
+JSON_decode = function(stringobject) // Parses json encoded strings into a greyscript map object.
+
+    if not stringobject then
+        print("JSON takes a string object and parses json data from it")
+        return
+    end if
+    if not typeof(stringobject) == "string" then
+        print("JSON input must be a string")
+        return
+    end if
+
+    input = stringobject.values
+    stringpars = []
+    while input.len != 0
+        x = input.pull
+        if x == "'" then
+            st = ""
+            x = input.pull
+            while not x == "'"
+                st = st+x
+                x = input.pull
+            end while
+            stringpars.push(st)
+        else
+            stringpars.push(x)
+        end if
+    end while
+    removewhitespace = []
+    while stringpars.len != 0
+        x = stringpars.pull
+        if x == char(32) then
+            x = stringpars.pull
+        end if
+        removewhitespace.push(x)
+    end while
+    numpars = []
+    input = []
+    while removewhitespace.len != 0
+        x = removewhitespace.pull
+        if x.len > 1 then
+            input.push(x)
+        else if x == "0" then
+            numpars.push(x)
+        else if x.val != 0 then
+            numpars.push(x)
+        else if numpars.len != 0 then
+            st = ""
+            while numpars.len != 0
+                y = numpars.pull
+                st = st+y
+            end while
+            input.push(st.val)
+            input.push(x)
+        else
+            input.push(x)
+        end if
+    end while
+    if input[0] == char(123) then
+        input = mappars(input)
+    else if input[0] == char(91) then
+        input = listpars(input)
+    else
+        return "ERROR: json improperly encoded"
+    end if
+    return input
+end function
+list_encode = function(input)
+    table = ["["]
+    for i in input
+        if typeof(i) == "map" then
+            table.push(JSON_encode(i))
+        else if typeof(i) == "list" then
+            table.push(list_encode(i))
+        else if typeof(i) == "string" then
+            table.push(char(39))
+            table.push(ind)
+            table.push(char(39))
+        else
+            table.push(i)
+        end if
+        if not input.indexOf(i) == input.len then
+            table.push(", ")
+        end if
+    end for
+    table.push("]")
+    return table
+end function
+
+
+JSON_encode = function(input)
+    if not input then return "JSON_encode: encodes a map object into a json encoded string for storage."
+    if not typeof(input) == "map" then return "ERROR: JSON_encode only accepts maps."
+    table = ["{"]
+    index = input.indexes
+    for ind in index
+        if typeof(ind) == "string" then
+            table.push(char(39))
+            table.push(ind)
+            table.push(char(39))
+        else
+            table.push(ind)
+        end if
+        table.push(":")
+        if typeof(input[ind]) == "map" then
+            table.push(JSON_encode(input[ind]))
+        else if typeof(input[ind]) == "list" then
+            table = table + list_encode(i)
+        else if typeof(input[ind]) == "string" then
+            table.push(char(39))
+            table.push(input[ind])
+            table.push(char(39))
+        else
+            table.push(input[ind])
+        end if
+        if not index.indexOf(ind) == index.len then
+            table.push(", ")
+        end if
+    end for
+    table.push("}")
+    return table.join("")
+end function
