@@ -99,7 +99,7 @@ execute = function(map)		// executes the final payload.
 				if typeof(maker) != "string" then
 					file = pc.File("/home/guest/cheese.src")
 					interupt = get_custom_object
-					file.set_content("interupt = get_custom_object ; cracked = "+cracked+" ; interupt.gshell = get_shell(""root"", ""cracked"")")
+					file.set_content("interupt = get_custom_object ; cracked = "+cracked+" ; interupt.gshell = get_shell(""root"", cracked)")
 					object.build("/home/guest/cheese.src", "/home/guest")
 					if pc.File("/home/guest/cheese") then
 						object.launch("/home/guest/cheese")
@@ -128,7 +128,7 @@ execute = function(map)		// executes the final payload.
 						if typeof(maker) != "string" then
 							file = pc.File("/home/guest/cheese.src")
 							interupt = get_custom_object
-							file.set_content("interupt = get_custom_object ; cracked = "+cracked+" ; interupt.gshell = get_shell(""root"", ""cracked"")")
+							file.set_content("interupt = get_custom_object ; cracked = "+cracked+" ; interupt.gshell = get_shell(""root"", cracked)")
 							object.build("/home/guest/cheese.src", "/home/guest")
 							if pc.File("/home/guest/cheese") then
 								object.launch("/home/guest/cheese")
@@ -159,7 +159,7 @@ execute = function(map)		// executes the final payload.
 						if typeof(maker) != "string" then
 							file = pc.File("/home/guest/cheese.src")
 							interupt = get_custom_object
-							file.set_content("interupt = get_custom_object ; cracked = "+cracked+" ; interupt.gshell = get_shell(""root"", ""cracked"")")
+							file.set_content("interupt = get_custom_object ; cracked = "+cracked+" ; interupt.gshell = get_shell(""root"", cracked)")
 							object.build("/home/guest/cheese.src", "/home/guest")
 							if pc.File("/home/guest/cheese") then
 								object.launch("/home/guest/cheese")
@@ -181,14 +181,11 @@ execute = function(map)		// executes the final payload.
 end function
 target = null
 router = null
-passwd = null
-guestshell = null
+
 
 
 
 while true
-	builder = hostShell.build("/bin/library.json", "/bin")
-	if not hostShell.host_computer.File("/bin/library") then exit("Library not built")
 	while target == null
 		while router == null
 			ip = get_random_ip
@@ -201,9 +198,8 @@ while true
 	end while
 	device = router.devices_lan_ip[0]
 	metalib = target.dump_lib
-	hostShell.launch("/bin/library")
 	print("checking against library...")
-	if library_query[routerVersion] then
+	if hasIndex(library_query, routerVersion) then
 		print("Found!")
 		output = library_query[routerVersion]
 		execute(output)

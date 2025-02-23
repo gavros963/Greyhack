@@ -172,7 +172,7 @@ JSON_encode = function(input)
         if typeof(input[ind]) == "map" then
             table.push(JSON_encode(input[ind]))
         else if typeof(input[ind]) == "list" then
-            table = table + list_encode(i)
+            table = table + list_encode(input[ind])
         else if typeof(input[ind]) == "string" then
             table.push(char(39))
             table.push(input[ind])
