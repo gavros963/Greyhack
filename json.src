@@ -187,3 +187,11 @@ JSON_encode = function(input)
     table.push("}")
     return table.join("")
 end function
+
+
+JSON_join = function(string1, string2)
+    if params.len < 1 then return 0
+    string1[:"}"]
+    string2["{":]
+    return string1+string2
+end function
