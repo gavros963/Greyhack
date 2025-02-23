@@ -141,7 +141,7 @@ list_encode = function(input)
             table.push(list_encode(i))
         else if typeof(i) == "string" then
             table.push(char(39))
-            table.push(ind)
+            table.push(i)
             table.push(char(39))
         else
             table.push(i)
