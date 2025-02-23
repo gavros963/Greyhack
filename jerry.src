@@ -3,11 +3,16 @@ crypto = include_lib("/lib/crypto.so")
 if not meta then exit("metaxploit.so not in /lib")
 if not crypto then exit("crypto.so not in /lib")
 hostShell = get_shell
-librarysrc = hostShell.host_computer.File("/bin/library.src")
-if not librarysrc then exit("Library.src missing in /bin")
+libraryjson = hostShell.host_computer.File("/bin/library.json")
+if not libraryjson then
+	hostShell.host_computer.touch("/bin/library.json")
+	libraryjson = hostShell.host_computer.File("/bin/library.json")
+	libraryjson.set_content("{'0.0.0':{'memory':['0xFFFFF', '0xFFFFFF'], 'values':['nodata', 'nodata'], 'objectTypes':['null', 'null']}}")
+end if
+import_code("/root/JSON")
 
 
-library_query = get_custom_object
+library_query = JSON_decode(libraryjson.get_content)
 
 findFile = function(fileObject, path)
     inputFolders = path.split("/")[:-1]
@@ -65,37 +70,27 @@ execute = function(map)		// executes the final payload.
 	memory = map.memory
 	values = map.values
 	objectTypes = map.objectTypes
-	privilage = map.privilage
 	objects = []
-	for mem in memory
-		index = memory.indexOf(mem)
-		if user == "root" and objectTypes[index] == "shell" then
-			object = metalib.overflow(mem, values[index], device)
-			rootShell = object
-			hostShell.scp("/lib/metaxploit.so", "/lib", rootShell)
-			hostShell.scp("/lib/crypto.so", "/lib", rootShell)
-			hostShell.scp("/bin/library.src", "/bin", rootShell)
-			hostShell.scp("/bin/jerry", "/bin", rootShell)
-			rootShell.launch("/bin/jerry")
-			exit()
-		end if
-	end for
 	for mem in memory
 		index = memory.indexOf(mem)
 		object = metalib.overflow(mem, values[index], device)
 		objects.push(object)
-		if objectTypes[index] == "file" or objectTypes[index] == "computer" and privilage[index] != "guest" then
-			if objectTypes[index] == "computer" then
-				passwd = object.File("/etc/passwd")
-			else
-				passwd = findFile(object, "/etc/passwd")
+	end for
+	for object in objects
+		index = objects.indexOf(object)
+		if typeof(object) == "shell" then
+			rootf = object.host_computer.File("/root")
+			if rootf.has_permission("w") then
+				hostShell.scp("/lib/metaxploit.so", "/lib", object)
+				hostShell.scp("/lib/crypto.so", "/lib", object)
+				hostShell.scp("/bin/library.src", "/bin", object)
+				hostShell.scp("/bin/jerry", "/bin", object)
+				object.launch("/bin/jerry")
+				exit()
 			end if
-			if passwd.get_content == "" then
-				passwd = null
-			end if
-			if passwd and guestshell then
-				object = objects[guestshell]
-				passwd = passwd.get_content
+			passf = object.host_computer.File("/etc/passwd")
+			if passf.has_permission("r") then
+				passwd = passf.get_content
 				rootpass = passwd[":":char(10)]
 				print("deciphering root password")
 				cracked = crypto.decipher(rootpass)
@@ -119,46 +114,80 @@ execute = function(map)		// executes the final payload.
 					end if
 				end if
 			end if
-		else if objectTypes[index] == "shell" and privilage[index] == "guest" then
-			if passwd then
-				passwd = passwd.get_content
-				rootpass = passwd[":":"\n"]
-				print("deciphering root password")
-				cracked = crypto.decipher(rootpass)
-				pc = object.host_computer
-				maker = pc.touch("/home/guest", "cheese.src")
-				if typeof(maker) != "string" then
-					file = pc.File("/home/guest/cheese.src")
-					interupt = get_custom_object
-					file.set_content("interupt = get_custom_object ; cracked = "+cracked+" ; interupt.gshell = get_shell(""root"", ""cracked"")")
-					object.build("/home/guest/cheese.src", "/home/guest")
-					if pc.File("/home/guest/cheese") then
-						object.launch("/home/guest/cheese")
-						rootShell = interupt.gshell
-						hostShell.scp("/lib/metaxploit.so", "/lib", rootShell)
-						hostShell.scp("/lib/crypto.so", "/lib", rootShell)
-						hostShell.scp("/bin/library.src", "/bin", rootShell)
-						hostShell.scp("/bin/jerry", "/bin", rootShell)
-						rootShell.launch("/bin/jerry")
-						exit()
+		else if typeof(object) == "computer" then
+			passf = object.File("/etc/passwd")
+			if passf.has_permission("r") then
+				passwd = passf.get_content
+				rootpass = passwd[":":char(10)]
+				for obj in objects
+					if typeof(obj) == "shell" then
+						print("deciphering root password")
+						cracked = crypto.decipher(rootpass)
+						pc = object.host_computer
+						maker = pc.touch("/home/guest", "cheese.src")
+						if typeof(maker) != "string" then
+							file = pc.File("/home/guest/cheese.src")
+							interupt = get_custom_object
+							file.set_content("interupt = get_custom_object ; cracked = "+cracked+" ; interupt.gshell = get_shell(""root"", ""cracked"")")
+							object.build("/home/guest/cheese.src", "/home/guest")
+							if pc.File("/home/guest/cheese") then
+								object.launch("/home/guest/cheese")
+								rootShell = interupt.gshell
+								hostShell.scp("/lib/metaxploit.so", "/lib", rootShell)
+								hostShell.scp("/lib/crypto.so", "/lib", rootShell)
+								hostShell.scp("/bin/library.src", "/bin", rootShell)
+								hostShell.scp("/bin/jerry", "/bin", rootShell)
+								print("launching deployed mouse")
+								rootShell.launch("/bin/jerry")
+								exit()
+							end if
+						end if
 					end if
-				end if
+				end for
 			end if
-			guestshell = index
+		else if typeof(object) == "file" then
+			passf = findFIle(object, "/etc/passwd")
+			if passf.has_permission("r") then
+				passwd = passf.get_content
+				rootpass = passwd[":":char(10)]
+				for obj in objects
+					if typeof(obj) == "shell" then
+						print("deciphering root password")
+						cracked = crypto.decipher(rootpass)
+						pc = object.host_computer
+						maker = pc.touch("/home/guest", "cheese.src")
+						if typeof(maker) != "string" then
+							file = pc.File("/home/guest/cheese.src")
+							interupt = get_custom_object
+							file.set_content("interupt = get_custom_object ; cracked = "+cracked+" ; interupt.gshell = get_shell(""root"", ""cracked"")")
+							object.build("/home/guest/cheese.src", "/home/guest")
+							if pc.File("/home/guest/cheese") then
+								object.launch("/home/guest/cheese")
+								rootShell = interupt.gshell
+								hostShell.scp("/lib/metaxploit.so", "/lib", rootShell)
+								hostShell.scp("/lib/crypto.so", "/lib", rootShell)
+								hostShell.scp("/bin/library.src", "/bin", rootShell)
+								hostShell.scp("/bin/jerry", "/bin", rootShell)
+								print("launching deployed mouse")
+								rootShell.launch("/bin/jerry")
+								exit()
+							end if
+						end if
+					end if
+				end for
+			end if
 		end if
 	end for
-	guestshell = null
-	passwd = null
 end function
 target = null
 router = null
 passwd = null
 guestshell = null
-library_query.output = null
+
 
 
 while true
-	builder = hostShell.build("/bin/library.src", "/bin")
+	builder = hostShell.build("/bin/library.json", "/bin")
 	if not hostShell.host_computer.File("/bin/library") then exit("Library not built")
 	while target == null
 		while router == null
@@ -172,18 +201,14 @@ while true
 	end while
 	device = router.devices_lan_ip[0]
 	metalib = target.dump_lib
-	library_query.ver = routerVersion
 	hostShell.launch("/bin/library")
 	print("checking against library...")
-	if library_query.output != null then
+	if library_query[routerVersion] then
 		print("Found!")
-		output = library_query.output
+		output = library_query[routerVersion]
 		execute(output)
 		target = null
 		router = null
-		library_query.output = null
-		guestshell = null
-		passwd = null
 		continue
 	end if
 	print("Version not found in library, beginning scan")
@@ -191,7 +216,6 @@ while true
 	values = []
 	objects = []
 	objectTypes = []
-	privilage = []
 
 	for mem in memory
 		value = meta.scan_address(metalib, mem)
@@ -214,16 +238,12 @@ while true
 			user = null
 		end if
 		objects.push(object)
-		privilage.push(user)
 	end for
 	print("updating library")
-	library_content = librarysrc.get_content
-	librarysrc.set_content(library_content+char(10)+"lib = {""memory"":"+memory+", ""values"":"+values+", ""objectTypes"":"+objectTypes+", ""privilage"":"+privilage+"}"+char(10)+"if libver == "+char(34)+routerVersion+char(34)+" then"+char(10)+"library_query.output = lib"+char(10)+"end if")
-	result = {"memory":memory, "values":values, "objectTypes":objectTypes, "privilage":privilage}
+	library_content = libraryjson.get_content
+	result = {routerVersion:{"memory":memory, "values":values}}
+	libraryjson.set_content(JSON_join(library_content, JSON_encode(result)))
 	execute(result)
 	target = null
 	router = null
-	library_query.output = null
-	guestshell = null
-	passwd = null
 end while
