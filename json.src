@@ -155,7 +155,7 @@ list_encode = function(input)
 end function
 
 
-JSON_encode = function(input)
+JSON_encode = function(input) // Encodes a map object into a json encoded string for storage.
     if not input then return "JSON_encode: encodes a map object into a json encoded string for storage."
     if not typeof(input) == "map" then return "ERROR: JSON_encode only accepts maps."
     table = ["{"]
@@ -189,7 +189,7 @@ JSON_encode = function(input)
 end function
 
 
-JSON_join = function(string1, string2)
+JSON_join = function(string1, string2) // merges json libraries together
     if params.len < 1 then return 0
     string1[:"}"]
     string2["{":]
