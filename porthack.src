@@ -62,7 +62,7 @@ end if
 if not library[lib.lib_name].hasIndex(lib.version) then
     print("lib version not found in library, begining scan...")
     memory = meta.scan(lib)
-    values = []
+    attack = {"values":[]}
     objects = []
     objectTypes = []
 
