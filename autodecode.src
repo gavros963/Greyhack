@@ -1,0 +1,29 @@
+// autodecode [file/encrypted password]
+crypto = get_lib("/lib/crypto.so")
+comp = get_shell.host_computer
+if params.len == 0 then
+    print("autodecode [file/encrypted password]")
+    exit
+end if
+if params[0].code == 47 then
+    passfile = comp.File(params[0]).get_content
+    if passfile.indexOf(char(10)) == null then
+        account = passfile.split(":")
+        account[1] = crypto.decipher(account[1])
+        account = account[0]+":"+account[1]
+        print(account)
+        exit
+    end if
+    accounts = passfile.split(char(10))
+    cracked = []
+    while accounts.len > 0
+        account = accounts.pop
+        account = account.split(":")
+        account[1] = crypto.decipher(account[1])
+        account = account[0]+":"+account[1]
+        cracked.push(account)
+    end while
+    print(cracked)
+    exit
+end if
+print(crypto.decipher(params[0]))
