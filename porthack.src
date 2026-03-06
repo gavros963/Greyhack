@@ -1,0 +1,174 @@
+// porthack [IP] [PORT] [OPTIONS]
+userCheck = function(fileObject) //check perm for npc machine
+    if not fileObject then; return "*guest"; end if
+    while fileObject.parent
+        fileObject = fileObject.parent
+    end while
+    homeFolder = null
+    for folder in fileObject.get_folders
+        if folder.name == "root" then
+            if folder.has_permission("w") and folder.has_permission("r") and folder.has_permission("x") then return "root"
+        end if
+        if folder.name == "home" then
+            homeFolder = folder
+        end if
+    end for
+    if not homeFolder then return "guest"
+    for folder in homeFolder.get_folders
+        if folder.name == "guest" then continue
+        if folder.chmod("u+rwx") == "" then
+            if folder.owner == folder.group then return folder.owner
+            return "*"+folder.group
+        end if
+    end for
+    return "guest"
+end function
+if not params.len >= 2 then
+    print("porthack [IP] [PORT] [OPTIONS]")
+    exit
+end if
+print("loading libraries...")
+meta = include_lib("/lib/metaxploit.so")
+print("metaxploit loaded")
+crypto = include_lib("/lib/metaxploit.so")
+print("crypto loaded")
+import_code("/bin/JSON")
+print("JSON loaded")
+print("All libraries loaded.")
+print("loading library")
+comp = get_shell.host_computer
+libraryjson = comp.File(home_dir + "/library.json")
+if not libraryjson then
+    print("library not found, generating empty library.json...")
+    comp.touch(home_dir, "library.json")
+    libraryjson = comp.File(home_dir + "/library.json")
+    libraryjson.set_content("{'nulllib':{'0.0.0':{'memory':['0xFFFFF', '0xFFFFFF'], 'values':['nodata', 'nodata'], 'objectTypes':['null', 'null']}}}")
+end if
+library = JSON_decode(libraryjson.get_content)
+
+ip = params[0]
+port = params[1].to_int
+netSession = meta.net_use(ip, port)
+if netSession == null then
+    print("invalid ip or port")
+    exit
+end if
+lib = netSession.dump_lib
+// check library here and load relevant library details.
+if hasIndex(library, lib.lib_name) == false then
+    print("new library "+lib.lib_name+" found! Adding to library...")
+    library[lib.lib_name] = {}
+end if
+if not library[lib.lib_name].hasIndex(lib.version) then
+    print("lib version not found in library, begining scan...")
+    memory = meta.scan(lib)
+    values = []
+    objects = []
+    objectTypes = []
+
+    for mem in memory
+        value = meta.scan_address(lib, mem)
+        value = value[value.indexOf("<b>")+3:value.indexOf("</b>")]
+        values.push(value)
+    end for
+    for mem in memory
+        index = memory.indexOf(mem)
+        if params[2] then
+            object = lib.overflow(mem, values[index], params[2])
+        else
+            object = lib.overflow(mem, values[index])
+        end if
+        objectType = typeof(object)
+        objectTypes.push(objectType)
+        if not objectType == null then
+            if objectType == "file" then
+			    user = userCheck(object)
+		    else if objectType == "computer" then
+			    user = userCheck(object.File("/var"))
+		    else if objectType == "shell" then
+			    user = userCheck(object.host_computer.File("/var"))
+		    else
+			    user = null
+            end if
+            print("exploit "+index+" is "+objectType+" with privelege level of "+user)
+        end if
+        objects.push(object)
+    end for
+    print("updating library...")
+    library[lib.lib_name][lib.version] = {"memory":memory, "values":values, "objectTypes":objectTypes}
+    libraryjson.set_content(JSON_encode(library))
+else
+    print("lib version in library, beginning attack...")
+    attack = library[lib.lib_name][lib.version]
+    memory = attack.memory
+    values = attack.values
+    objectTypes = attack.objectTypes
+    objects = []
+    for objectType in objectTypes
+        index = indexOf(objectTypes, objectType)
+        if objectType == "number" then
+            if params[2] then
+                object = lib.overflow(memory[index], values[index], params[2])
+            else
+                str = user_input("passwd change/router bounce, please provide further input:")
+                object = lib.overflow(memory[index], values[index], str)
+            end if
+        else
+            lib.overflow(memory[index], values[index])
+        end if
+        objects.push(object)
+    end for
+end if
+
+print("hack complete! Displaying options:")
+for object in objects
+    index = objects.indexOf(object)
+    if typeof(object) == "file" then
+         user = userCheck(object)
+    else if typeof(object) == "computer" then
+        user = userCheck(object.File("/var"))
+    else if typeof(object) == "shell" then
+        user = userCheck(object.host_computer.File("/var"))
+    else
+        user = ""
+    end if
+    print(index+": "+typeof(object)+" "+user)
+end for
+for object in objects
+    if typeof(object) == "shell" then
+        object.start_terminal
+    else if typeof(object) == "computer" then
+        if object.File("/etc/passwd").has_permission("r") then
+            rootpass = crypto.decipher(object.File("/etc/passwd").get_content[":":char(10)])
+            print(rootpass)
+        end if
+    else if typeof(object) == "file" then
+        while object.parent
+            object = object.parent
+        end while
+        for folder in object.get_folders
+            if folder.name == "etc" then
+                object = folder
+                break
+            end if
+        end for
+        for file in object.get_files
+            if file.name == "passwd" then
+                object = file
+                break
+            end if
+        end for
+        rootpass = crypto.decipher(object.get_content[":":char(10)])
+    end if
+end for
+
+
+
+    
+
+
+
+
+
+
+
