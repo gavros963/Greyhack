@@ -68,32 +68,37 @@ if not library[lib.lib_name].hasIndex(lib.version) then
 
     for mem in memory
         value = meta.scan_address(lib, mem)
-        value = value[value.indexOf("<b>")+3:value.indexOf("</b>")]
-        values.push(value)
-    end for
-    for mem in memory
-        index = memory.indexOf(mem)
-        if params[2] then
-            object = lib.overflow(mem, values[index], params[2])
-        else
-            object = lib.overflow(mem, values[index])
-        end if
-        objectType = typeof(object)
-        objectTypes.push(objectType)
-        if not objectType == null then
-            if objectType == "file" then
-			    user = userCheck(object)
-		    else if objectType == "computer" then
-			    user = userCheck(object.File("/var"))
-		    else if objectType == "shell" then
-			    user = userCheck(object.host_computer.File("/var"))
-		    else
-			    user = null
+        value = value.split("Unsafe check:")
+        value.pull
+        attack[mem] = {"values":[]}
+        for vuln in value
+            vuln = vuln[vuln.indexOf("<b>")+3:vuln.indexOf("</b>")]
+            if params.len == 3 then
+                object = lib.overflow(mem, vuln, params[2])
+            else
+                object = lib.overflow(mem, vuln)
             end if
-            print("exploit "+index+" is "+objectType+" with privelege level of "+user)
-        end if
-        objects.push(object)
+            objectType = typeof(object)
+            if not objectType == null then
+                if objectType == "file" then
+			        user = userCheck(object)
+		        else if objectType == "computer" then
+			        user = userCheck(object.File("/var"))
+		        else if objectType == "shell" then
+			        user = userCheck(object.host_computer.File("/var"))
+		        else
+			        user = null
+                end if
+                print("exploit "+mem+"+"+vuln+" is "+objectType+" with privelege level of "+user)
+                objects.push(object)
+            end if
+            attack[mem].values.push(vuln)
+            attack[mem][vuln] = objectType
+        end for
+       // value = value[value.indexOf("<b>")+3:value.indexOf("</b>")]
+    
     end for
+    
     print("updating library...")
     library[lib.lib_name][lib.version] = {"memory":memory, "values":values, "objectTypes":objectTypes}
     libraryjson.set_content(JSON_encode(library))

@@ -1,0 +1,106 @@
+// libhack [library]
+userCheck = function(fileObject) //check perm for npc machine
+    if not fileObject then; return "*guest"; end if
+    while fileObject.parent
+        fileObject = fileObject.parent
+    end while
+    homeFolder = null
+    for folder in fileObject.get_folders
+        if folder.name == "root" then
+            if folder.has_permission("w") and folder.has_permission("r") and folder.has_permission("x") then return "root"
+        end if
+        if folder.name == "home" then
+            homeFolder = folder
+        end if
+    end for
+    if not homeFolder then return "guest"
+    for folder in homeFolder.get_folders
+        if folder.name == "guest" then continue
+        if folder.chmod("u+rwx") == "" then
+            if folder.owner == folder.group then return folder.owner
+            return "*"+folder.group
+        end if
+    end for
+    return "guest"
+end function
+meta = include_lib("/lib/metaxploit.so")
+if not meta then
+    meta = include_lib(home_dir+"/metaxploit.so")
+    if not meta then
+        print("metaxploit.so not found")
+        exit
+    end if
+end if
+import_code("/bin/JSON")
+comp = get_shell.host_computer
+
+libraryjson = comp.File(home_dir + "/library.json")
+if not libraryjson then
+    print("library not found, generating empty library.json...")
+    comp.touch(home_dir, "library.json")
+    libraryjson = comp.File(home_dir + "/library.json")
+    libraryjson.set_content("{'nulllib':{'0.0.0':{'memory':{'0xFFFFF':{'nodata':'null', 'nodata':'null'}, '0xFFFFFF':{'nodata':'null', 'nodata':'null'}}, }}}")
+end if
+library = JSON_decode(libraryjson.get_content)
+lib = meta.load(params[0])
+if not lib then exit("ERROR: library not found")
+if hasIndex(library, lib.lib_name) == false then
+    print("new library "+lib.lib_name+" found! Adding to library...")
+    library[lib.lib_name] = {}
+end if
+objects = []
+if not library[lib.lib_name].hasIndex(lib.version) then
+    print("lib version not found in library, beginning scan...")
+    memory = meta.scan(lib)
+    attack = {}
+    for mem in memory
+        value = meta.scan_address(lib, mem)
+        value = value.split("Unsafe check:")
+        value.pull
+        attack[mem] = {"values":[]}
+        for vuln in value
+            vuln = vuln[vuln.indexOf("<b>")+3:vuln.indexOf("</b>")]
+            object = lib.overflow(mem, vuln)
+            objectType = typeof(object)
+            if not objectType == null then
+                if objectType == "file" then
+			        user = userCheck(object)
+		        else if objectType == "computer" then
+			        user = userCheck(object.File("/var"))
+		        else if objectType == "shell" then
+			        user = userCheck(object.host_computer.File("/var"))
+		        else
+			        user = null
+                end if
+                print("exploit "+mem+"+"+vuln+" is "+objectType+" with privelege level of "+user)
+                objects.push(object)
+            end if
+            attack[mem].values.push(vuln)
+            attack[mem][vuln] = objectType
+        end for
+       // value = value[value.indexOf("<b>")+3:value.indexOf("</b>")]
+    
+    end for
+else    
+    print("updating library...")
+    library[lib.lib_name][lib.version] = {"memory":memory, "attack":attack}
+    libraryjson.set_content(JSON_encode(library))
+
+    print("lib version in library, beginning attack...")
+    attacks = library[lib.lib_name][lib.version]
+    memory = attacks.memory
+    attack = attacks.attack
+    objects = []
+    for mem in memory
+        values = attack[mem].values
+        for vuln in values
+            if attack[mem][vuln] == "number" then
+                pass = user_input("please provide new password")
+                object = lib.overflow(mem, vuln, pass)
+            else
+                object = lib.overflow(mem, vuln)
+            end if
+            objects.push(object)
+        end for
+    end for
+end if
