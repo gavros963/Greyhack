@@ -32,8 +32,7 @@ meta = include_lib("/lib/metaxploit.so")
 print("metaxploit loaded")
 crypto = include_lib("/lib/metaxploit.so")
 print("crypto loaded")
-import_code("/bin/JSON")
-print("JSON loaded")
+import_code("/bin/json")
 print("All libraries loaded.")
 print("loading library")
 comp = get_shell.host_computer
@@ -44,7 +43,7 @@ if not libraryjson then
     libraryjson = comp.File(home_dir + "/library.json")
     libraryjson.set_content("{'nulllib':{'0.0.0':{'memory':['0xFFFFF', '0xFFFFFF'], 'values':['nodata', 'nodata'], 'objectTypes':['null', 'null']}}}")
 end if
-library = JSON_decode(libraryjson.get_content)
+library = json.Deserialize(libraryjson.get_content)
 
 ip = params[0]
 port = params[1].to_int
@@ -100,28 +99,25 @@ if not library[lib.lib_name].hasIndex(lib.version) then
     end for
     
     print("updating library...")
-    library[lib.lib_name][lib.version] = {"memory":memory, "values":values, "objectTypes":objectTypes}
-    libraryjson.set_content(JSON_encode(library))
+    library[lib.lib_name][lib.version] = {"memory":memory, "attack":attack}
+    libraryjson.set_content(json.Serialize(library))
 else
     print("lib version in library, beginning attack...")
-    attack = library[lib.lib_name][lib.version]
-    memory = attack.memory
-    values = attack.values
-    objectTypes = attack.objectTypes
+    attacks = library[lib.lib_name][lib.version]
+    memory = attacks.memory
+    attack = attacks.attack
     objects = []
-    for objectType in objectTypes
-        index = indexOf(objectTypes, objectType)
-        if objectType == "number" then
-            if params[2] then
-                object = lib.overflow(memory[index], values[index], params[2])
+    for mem in memory
+        values = attack[mem].values
+        for vuln in values
+            if attack[mem][vuln] == "number" then
+                pass = user_input("please provide new password")
+                object = lib.overflow(mem, vuln, pass)
             else
-                str = user_input("passwd change/router bounce, please provide further input:")
-                object = lib.overflow(memory[index], values[index], str)
+                object = lib.overflow(mem, vuln)
             end if
-        else
-            lib.overflow(memory[index], values[index])
-        end if
-        objects.push(object)
+            objects.push(object)
+        end for
     end for
 end if
 
@@ -139,7 +135,13 @@ for object in objects
     end if
     print(index+": "+typeof(object)+" "+user)
 end for
-for object in objects
+
+
+target = user_input("select a exploit:").to_int
+
+object = objects[target]
+
+
     if typeof(object) == "shell" then
         object.start_terminal
     else if typeof(object) == "computer" then
@@ -163,9 +165,54 @@ for object in objects
                 break
             end if
         end for
-        rootpass = crypto.decipher(object.get_content[":":char(10)])
+     //   rootpass = crypto.decipher(object.get_content[":":char(10)])
+        if object.has_permission("r") then
+        	rootpass = crypto.decipher(object.get_content[":":char(10)])
+			print(rootpass)
+		else
+			bank = []
+			mail = []
+			while object.parent
+				object = object.parent
+			end while
+			for folder in object.get_folders
+				if folder.name == "home" then
+					object = folder
+				end if
+			end for
+			for folder in object
+				if not folder.name == "guest" then
+					for f in folder.get_folders
+						if f.name == "config" then
+							for file in f.get_files
+								if file.name == "Bank.txt" then
+									accounts = file.get_content
+									accounts = accounts.split(char(10))
+									for account in accounts
+										account = account.split(":")
+										account[1] = crypto.decypher(account[1])
+										account = account[0] +":"+ account[1]
+									end for
+									bank = bank + accounts
+								end if
+								if file.name == "Mail.txt" then
+									accounts = file.get_content
+									accounts = accounts.split(char(10))
+									for account in accounts
+										account = account.split(":")
+										account[1] = crypto.decypher(account[1])
+										account = account[0] +":"+ account[1]
+									end for
+									mail = mail + accounts
+								end if
+							end for
+						end if
+					end for
+				end if
+			end for
+        end if	
     end if
-end for
+
 
 
 
