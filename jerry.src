@@ -9,10 +9,10 @@ if not libraryjson then
 	libraryjson = hostShell.host_computer.File("/bin/library.json")
 	libraryjson.set_content("{'0.0.0':{'memory':['0xFFFFF', '0xFFFFFF'], 'values':['nodata', 'nodata'], 'objectTypes':['null', 'null']}}")
 end if
-import_code("/root/JSON")
+import_code("/bin/json")
 
 
-library_query = JSON_decode(libraryjson.get_content)
+library_query = json.Deserialize(libraryjson.get_content)
 
 findFile = function(fileObject, path)
     inputFolders = path.split("/")[:-1]
@@ -83,7 +83,7 @@ execute = function(map)		// executes the final payload.
 			if rootf.has_permission("w") then
 				hostShell.scp("/lib/metaxploit.so", "/lib", object)
 				hostShell.scp("/lib/crypto.so", "/lib", object)
-				hostShell.scp("/bin/library.src", "/bin", object)
+				hostShell.scp("/bin/library.json", "/bin", object)
 				hostShell.scp("/bin/jerry", "/bin", object)
 				object.launch("/bin/jerry")
 				exit()
@@ -106,7 +106,7 @@ execute = function(map)		// executes the final payload.
 						rootShell = interupt.gshell
 						hostShell.scp("/lib/metaxploit.so", "/lib", rootShell)
 						hostShell.scp("/lib/crypto.so", "/lib", rootShell)
-						hostShell.scp("/bin/library.src", "/bin", rootShell)
+						hostShell.scp("/bin/library.json", "/bin", rootShell)
 						hostShell.scp("/bin/jerry", "/bin", rootShell)
 						print("launching deployed mouse")
 						rootShell.launch("/bin/jerry")
@@ -135,7 +135,7 @@ execute = function(map)		// executes the final payload.
 								rootShell = interupt.gshell
 								hostShell.scp("/lib/metaxploit.so", "/lib", rootShell)
 								hostShell.scp("/lib/crypto.so", "/lib", rootShell)
-								hostShell.scp("/bin/library.src", "/bin", rootShell)
+								hostShell.scp("/bin/library.json", "/bin", rootShell)
 								hostShell.scp("/bin/jerry", "/bin", rootShell)
 								print("launching deployed mouse")
 								rootShell.launch("/bin/jerry")
@@ -146,7 +146,7 @@ execute = function(map)		// executes the final payload.
 				end for
 			end if
 		else if typeof(object) == "file" then
-			passf = findFIle(object, "/etc/passwd")
+			passf = findFile(object, "/etc/passwd")
 			if passf.has_permission("r") then
 				passwd = passf.get_content
 				rootpass = passwd[":":char(10)]
@@ -166,7 +166,7 @@ execute = function(map)		// executes the final payload.
 								rootShell = interupt.gshell
 								hostShell.scp("/lib/metaxploit.so", "/lib", rootShell)
 								hostShell.scp("/lib/crypto.so", "/lib", rootShell)
-								hostShell.scp("/bin/library.src", "/bin", rootShell)
+								hostShell.scp("/bin/library.json", "/bin", rootShell)
 								hostShell.scp("/bin/jerry", "/bin", rootShell)
 								print("launching deployed mouse")
 								rootShell.launch("/bin/jerry")
@@ -209,36 +209,44 @@ while true
 	end if
 	print("Version not found in library, beginning scan")
 	memory = meta.scan(metalib)
-	values = []
-	objects = []
-	objectTypes = []
+	attack = {}
+    objects = []
+    objectTypes = []
 
-	for mem in memory
-		value = meta.scan_address(metalib, mem)
-		value = value[value.indexOf("<b>")+3:value.indexOf("</b>")]
-		values.push(value)
-	end for
-	for mem in memory
-		index = memory.indexOf(mem)
-		object = metalib.overflow(mem, values[index], device)
-		print
-		objectType = typeof(object)
-		objectTypes.push(objectType)
-		if objectType == "file" then
-			user = userCheck(object)
-		else if objectType == "computer" then
-			user = userCheck(object.File("/var"))
-		else if objectType == "shell" then
-			user = userCheck(object.host_computer.File("/var"))
-		else
-			user = null
-		end if
-		objects.push(object)
+    for mem in memory
+        value = meta.scan_address(metalib, mem)
+        value = value.split("Unsafe check:")
+        value.pull
+        attack[mem] = {"values":[]}
+        for vuln in value
+            vuln = vuln[vuln.indexOf("<b>")+3:vuln.indexOf("</b>")]
+            if params.len == 3 then
+                object = metalib.overflow(mem, vuln, params[2])
+            else
+                object = metalib.overflow(mem, vuln)
+            end if
+            objectType = typeof(object)
+            if not objectType == null then
+                if objectType == "file" then
+			        user = userCheck(object)
+		        else if objectType == "computer" then
+			        user = userCheck(object.File("/var"))
+		        else if objectType == "shell" then
+			        user = userCheck(object.host_computer.File("/var"))
+		        else
+			        user = null
+                end if
+                print("exploit "+mem+"+"+vuln+" is "+objectType+" with privelege level of "+user)
+                objects.push(object)
+            end if
+            attack[mem].values.push(vuln)
+            attack[mem][vuln] = objectType
+        end for
 	end for
 	print("updating library")
-	library_content = libraryjson.get_content
-	result = {routerVersion:{"memory":memory, "values":values}}
-	libraryjson.set_content(JSON_join(library_content, JSON_encode(result)))
+	library_query[routerVersion] = {"memory":memory, "attack":attack}
+//	result = {routerVersion:{"memory":memory, "values":values}}
+	libraryjson.set_content(json.Serialize(library_query))
 	execute(result)
 	target = null
 	router = null
