@@ -68,13 +68,16 @@ end function
 
 execute = function(map)		// executes the final payload.
 	memory = map.memory
-	values = map.values
-	objectTypes = map.objectTypes
+	attacks = map.attack
+//	values = map.values
+//	objectTypes = map.objectTypes
 	objects = []
 	for mem in memory
-		index = memory.indexOf(mem)
-		object = metalib.overflow(mem, values[index], device)
-		objects.push(object)
+		for value in attacks[mem].values
+//			index = memory.indexOf(mem)
+			object = metalib.overflow(mem, value, device)
+			objects.push(object)
+		end for
 	end for
 	for object in objects
 		index = objects.indexOf(object)
@@ -86,7 +89,7 @@ execute = function(map)		// executes the final payload.
 				hostShell.scp("/bin/library.json", "/bin", object)
 				hostShell.scp("/bin/jerry", "/bin", object)
 				object.launch("/bin/jerry")
-				exit()
+				
 			end if
 			passf = object.host_computer.File("/etc/passwd")
 			if passf.has_permission("r") then
@@ -110,7 +113,7 @@ execute = function(map)		// executes the final payload.
 						hostShell.scp("/bin/jerry", "/bin", rootShell)
 						print("launching deployed mouse")
 						rootShell.launch("/bin/jerry")
-						exit()
+						
 					end if
 				end if
 			end if
@@ -123,15 +126,15 @@ execute = function(map)		// executes the final payload.
 					if typeof(obj) == "shell" then
 						print("deciphering root password")
 						cracked = crypto.decipher(rootpass)
-						pc = object.host_computer
+						pc = obj.host_computer
 						maker = pc.touch("/home/guest", "cheese.src")
 						if typeof(maker) != "string" then
 							file = pc.File("/home/guest/cheese.src")
 							interupt = get_custom_object
 							file.set_content("interupt = get_custom_object ; cracked = "+cracked+" ; interupt.gshell = get_shell(""root"", cracked)")
-							object.build("/home/guest/cheese.src", "/home/guest")
+							obj.build("/home/guest/cheese.src", "/home/guest")
 							if pc.File("/home/guest/cheese") then
-								object.launch("/home/guest/cheese")
+								obj.launch("/home/guest/cheese")
 								rootShell = interupt.gshell
 								hostShell.scp("/lib/metaxploit.so", "/lib", rootShell)
 								hostShell.scp("/lib/crypto.so", "/lib", rootShell)
@@ -139,7 +142,7 @@ execute = function(map)		// executes the final payload.
 								hostShell.scp("/bin/jerry", "/bin", rootShell)
 								print("launching deployed mouse")
 								rootShell.launch("/bin/jerry")
-								exit()
+								
 							end if
 						end if
 					end if
@@ -154,15 +157,15 @@ execute = function(map)		// executes the final payload.
 					if typeof(obj) == "shell" then
 						print("deciphering root password")
 						cracked = crypto.decipher(rootpass)
-						pc = object.host_computer
+						pc = obj.host_computer
 						maker = pc.touch("/home/guest", "cheese.src")
 						if typeof(maker) != "string" then
 							file = pc.File("/home/guest/cheese.src")
 							interupt = get_custom_object
 							file.set_content("interupt = get_custom_object ; cracked = "+cracked+" ; interupt.gshell = get_shell(""root"", cracked)")
-							object.build("/home/guest/cheese.src", "/home/guest")
+							obj.build("/home/guest/cheese.src", "/home/guest")
 							if pc.File("/home/guest/cheese") then
-								object.launch("/home/guest/cheese")
+								obj.launch("/home/guest/cheese")
 								rootShell = interupt.gshell
 								hostShell.scp("/lib/metaxploit.so", "/lib", rootShell)
 								hostShell.scp("/lib/crypto.so", "/lib", rootShell)
@@ -170,7 +173,7 @@ execute = function(map)		// executes the final payload.
 								hostShell.scp("/bin/jerry", "/bin", rootShell)
 								print("launching deployed mouse")
 								rootShell.launch("/bin/jerry")
-								exit()
+								
 							end if
 						end if
 					end if
@@ -247,7 +250,7 @@ while true
 	library_query[routerVersion] = {"memory":memory, "attack":attack}
 //	result = {routerVersion:{"memory":memory, "values":values}}
 	libraryjson.set_content(json.Serialize(library_query))
-	execute(result)
+	execute(library_query[routerVersion])
 	target = null
 	router = null
 end while
