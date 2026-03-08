@@ -1,0 +1,689 @@
+{
+  "libhttp.so": {
+    "1.2.4": {
+      "memory": [
+        "0x2068E6F8",
+        "0x4DAA783D",
+        "0x316DA750"
+      ],
+      "attack": {
+        "0x2068E6F8": {
+          "values": [
+            "fast",
+            "extsrep_3_6",
+            "text",
+            "linelines"
+          ],
+          "fast": "null",
+          "extsrep_3_6": "null",
+          "text": "null",
+          "linelines": "null"
+        },
+        "0x4DAA783D": {
+          "values": [
+            "showbuttoncli",
+            "throw"
+          ],
+          "showbuttoncli": "null",
+          "throw": "file"
+        },
+        "0x316DA750": {
+          "values": [
+            "ostatebytebuttonteratelist",
+            "last_lit_b",
+            "celend_bitsdyn"
+          ],
+          "ostatebytebuttonteratelist": "null",
+          "last_lit_b": "number",
+          "celend_bitsdyn": "null"
+        }
+      }
+    },
+    "1.8.2": {
+      "memory": [
+        "0x494387FF",
+        "0x6B4A3CCF",
+        "0x44B56C2C",
+        "0x6BCBE901",
+        "0x92ADD90",
+        "0x401C474F"
+      ],
+      "attack": {
+        "0x494387FF": {
+          "values": [
+            "selhight2tratorcontextef",
+            "stanchor",
+            "stopwatchstackpush_",
+            "tanchortbackco"
+          ],
+          "selhight2tratorcontextef": "null",
+          "stanchor": "null",
+          "stopwatchstackpush_": "null",
+          "tanchortbackco": "null"
+        },
+        "0x6B4A3CCF": {
+          "values": [
+            "hemecharamar",
+            "mesbuil"
+          ],
+          "hemecharamar": "null",
+          "mesbuil": "null"
+        },
+        "0x44B56C2C": {
+          "values": [
+            "equalbytesi",
+            "colorspringcound",
+            "sh_shiftrue"
+          ],
+          "equalbytesi": "null",
+          "colorspringcound": "null",
+          "sh_shiftrue": "number"
+        },
+        "0x6BCBE901": {
+          "values": [
+            "enumsizedeltaddli",
+            "namemaxchanb",
+            "tionpareanimatorcelengthsbuild_tr_scro",
+            "ditorplayona",
+            "istatelin"
+          ],
+          "enumsizedeltaddli": "shell",
+          "namemaxchanb": "null",
+          "tionpareanimatorcelengthsbuild_tr_scro": "null",
+          "ditorplayona": "computer",
+          "istatelin": "computer"
+        },
+        "0x92ADD90": {
+          "values": [
+            "selecternalco",
+            "tivetreeenovetrue",
+            "sela",
+            "listend_bitsd",
+            "ommax_b"
+          ],
+          "selecternalco": "number",
+          "tivetreeenovetrue": "null",
+          "sela": "null",
+          "listend_bitsd": "null",
+          "ommax_b": "null"
+        },
+        "0x401C474F": {
+          "values": [
+            "_lendre",
+            "positionshow"
+          ],
+          "_lendre": "null",
+          "positionshow": "null"
+        }
+      }
+    }
+  },
+  "init.so": {
+    "1.1.5": {
+      "memory": [
+        "0x6842706A",
+        "0x374867C6",
+        "0x119089DE",
+        "0x212C3421"
+      ],
+      "attack": {
+        "0x6842706A": {
+          "values": [
+            "atch_length",
+            "textpositionterraycopywinvok",
+            "ast_litern"
+          ],
+          "atch_length": "computer",
+          "textpositionterraycopywinvok": "null",
+          "ast_litern": "null"
+        },
+        "0x374867C6": {
+          "values": [
+            "lresultse",
+            "ewportimeshupdatebuttonsh",
+            "eresultvaluesrepz_11_",
+            "onleveline"
+          ],
+          "lresultse": "null",
+          "ewportimeshupdatebuttonsh": "null",
+          "eresultvaluesrepz_11_": "null",
+          "onleveline": "null"
+        },
+        "0x119089DE": {
+          "values": [
+            "timesh",
+            "endpoint_onl",
+            "lavor"
+          ],
+          "timesh": "null",
+          "endpoint_onl": "shell",
+          "lavor": "null"
+        },
+        "0x212C3421": {
+          "values": [
+            "ionresult++",
+            "yn_treein",
+            "set",
+            "dtransfor"
+          ],
+          "ionresult++": "null",
+          "yn_treein": "computer",
+          "set": "computer",
+          "dtransfor": "file"
+        }
+      }
+    },
+    "1.6.8": {
+      "memory": [
+        "0x3B72D59E",
+        "0x70BA6CC3",
+        "0x20764D0F",
+        "0x513DC2C3",
+        "0x781F295"
+      ],
+      "attack": {
+        "0x3B72D59E": {
+          "values": [
+            "tor3",
+            "graphic",
+            "datebytebuttontextobje"
+          ],
+          "tor3": "null",
+          "graphic": "null",
+          "datebytebuttontextobje": "null"
+        },
+        "0x70BA6CC3": {
+          "values": [
+            "toredx",
+            "tedcolor_viewselengtho"
+          ],
+          "toredx": "null",
+          "tedcolor_viewselengtho": "null"
+        },
+        "0x20764D0F": {
+          "values": [
+            "stanchoredx",
+            "ultreend_b",
+            "uotenertl"
+          ],
+          "stanchoredx": "null",
+          "ultreend_b": "null",
+          "uotenertl": "null"
+        },
+        "0x513DC2C3": {
+          "values": [
+            "putshortmsb",
+            "utshowcalse",
+            "texttex"
+          ],
+          "putshortmsb": "null",
+          "utshowcalse": "null",
+          "texttex": "null"
+        },
+        "0x781F295": {
+          "values": [
+            "need",
+            "blocall00"
+          ],
+          "need": "null",
+          "blocall00": "null"
+        }
+      }
+    }
+  },
+  "libssh.so": {
+    "3.3.3": {
+      "memory": [
+        "0x4310CB2E",
+        "0x7649569F",
+        "0x3C51B2EF"
+      ],
+      "attack": {
+        "values": [
+          
+        ],
+        "0x4310CB2E": {
+          "values": [
+            "d_codec_adler32",
+            "containlevent_"
+          ],
+          "d_codec_adler32": "null",
+          "containlevent_": "null"
+        },
+        "0x7649569F": {
+          "values": [
+            "eady_",
+            "nitionandardown"
+          ],
+          "eady_": "null",
+          "nitionandardown": "null"
+        },
+        "0x3C51B2EF": {
+          "values": [
+            "ypareturnalco",
+            "offsetackaddlinertedorren"
+          ],
+          "ypareturnalco": "file",
+          "offsetackaddlinertedorren": "null"
+        }
+      }
+    }
+  },
+  "kernel_router.so": {
+    "6.1.2": {
+      "memory": [
+        "0x5B7B6DEF",
+        "0x3F022162"
+      ],
+      "attack": {
+        "values": [
+          
+        ],
+        "0x5B7B6DEF": {
+          "values": [
+            "icitreebitsl",
+            "tainputshowindo"
+          ],
+          "icitreebitsl": "shell",
+          "tainputshowindo": "shell"
+        },
+        "0x3F022162": {
+          "values": [
+            "or_titletextsreat",
+            "lushpa",
+            "parames",
+            "turnal",
+            "alues"
+          ],
+          "or_titletextsreat": "computer",
+          "lushpa": "shell",
+          "parames": "file",
+          "turnal": "shell",
+          "alues": "number"
+        }
+      }
+    },
+    "6.5.2": {
+      "memory": [
+        "0x10588D39",
+        "0x5114AD6C"
+      ],
+      "attack": {
+        "0x10588D39": {
+          "values": [
+            "data",
+            "memax_c",
+            "taskbarforentposition",
+            "ceoffsetsettext"
+          ],
+          "data": "number",
+          "memax_c": "shell",
+          "taskbarforentposition": "shell",
+          "ceoffsetsettext": "shell"
+        },
+        "0x5114AD6C": {
+          "values": [
+            "resultsel",
+            "resultnum+"
+          ],
+          "resultsel": "shell",
+          "resultnum+": "number"
+        }
+      }
+    },
+    "2.3.8": {
+      "memory": [
+        "0x77944C3E",
+        "0x765CA28C",
+        "0x777340A",
+        "0x7D2307B7"
+      ],
+      "attack": {
+        "0x77944C3E": {
+          "values": [
+            "ailabletextreei",
+            "defier",
+            "labletextinusb",
+            "itionstare",
+            "end_bitsdyn_lengthcod"
+          ],
+          "ailabletextreei": "file",
+          "defier": "file",
+          "labletextinusb": "shell",
+          "itionstare": "shell",
+          "end_bitsdyn_lengthcod": "number"
+        },
+        "0x765CA28C": {
+          "values": [
+            "ower",
+            "_availabledthis",
+            "troybutto"
+          ],
+          "ower": "number",
+          "_availabledthis": "number",
+          "troybutto": "file"
+        },
+        "0x777340A": {
+          "values": [
+            "base",
+            "havedoublicked",
+            "ulttextobjec",
+            "opydi",
+            "ewriternalcodec_"
+          ],
+          "base": "null",
+          "havedoublicked": "number",
+          "ulttextobjec": "shell",
+          "opydi": "number",
+          "ewriternalcodec_": "file"
+        },
+        "0x7D2307B7": {
+          "values": [
+            "ourcelendpositiona",
+            "erbuttontextstransformlo",
+            "setactorplaybackundostati",
+            "tonte"
+          ],
+          "ourcelendpositiona": "shell",
+          "erbuttontextstransformlo": "number",
+          "setactorplaybackundostati": "number",
+          "tonte": "number"
+        }
+      }
+    }
+  },
+  "libsql.so": {
+    "1.6.0": {
+      "memory": [
+        "0x7F1998FF",
+        "0x193460E0",
+        "0x352847FC",
+        "0x67F840CE",
+        "0x601955AF",
+        "0x2E86CD9F",
+        "0x40F6C77A",
+        "0x67C54196"
+      ],
+      "attack": {
+        "0x7F1998FF": {
+          "values": [
+            "olor_buttonsolewrit",
+            "edyn_lt",
+            "essignim",
+            "displa"
+          ],
+          "olor_buttonsolewrit": "computer",
+          "edyn_lt": "null",
+          "essignim": "number",
+          "displa": "file"
+        },
+        "0x193460E0": {
+          "values": [
+            "an_end_bl",
+            "sbheadp"
+          ],
+          "an_end_bl": "computer",
+          "sbheadp": "null"
+        },
+        "0x352847FC": {
+          "values": [
+            "olor_buttonsprite",
+            "nimizetresultnames"
+          ],
+          "olor_buttonsprite": "number",
+          "nimizetresultnames": "number"
+        },
+        "0x67F840CE": {
+          "values": [
+            "utputbuttonshowbut",
+            "isoncl",
+            "showindentdatablet"
+          ],
+          "utputbuttonshowbut": "null",
+          "isoncl": "null",
+          "showindentdatablet": "file"
+        },
+        "0x601955AF": {
+          "values": [
+            "ock_oncomprevstrs",
+            "scalposli",
+            "audiosourcevolum",
+            "dateoutoviewport",
+            "cesdyn_tr_flushparactionary"
+          ],
+          "ock_oncomprevstrs": "number",
+          "scalposli": "null",
+          "audiosourcevolum": "shell",
+          "dateoutoviewport": "shell",
+          "cesdyn_tr_flushparactionary": "shell"
+        },
+        "0x2E86CD9F": {
+          "values": [
+            "extpush_match_lendpo",
+            "splayedvaluesaddregion",
+            "incodeaddres",
+            "tresul"
+          ],
+          "extpush_match_lendpo": "null",
+          "splayedvaluesaddregion": "null",
+          "incodeaddres": "null",
+          "tresul": "null"
+        },
+        "0x40F6C77A": {
+          "values": [
+            "tainentdataud",
+            "engthcodelt",
+            "bitlen",
+            "treetreeth"
+          ],
+          "tainentdataud": "null",
+          "engthcodelt": "null",
+          "bitlen": "shell",
+          "treetreeth": "number"
+        },
+        "0x67C54196": {
+          "values": [
+            "flush_bit",
+            "sionpointextend_treedyn_ltrec",
+            "tuitextvmyie"
+          ],
+          "flush_bit": "null",
+          "sionpointextend_treedyn_ltrec": "null",
+          "tuitextvmyie": "null"
+        }
+      }
+    }
+  },
+  "net.so": {
+    "1.3.2": {
+      "memory": [
+        "0x512D97C8",
+        "0x7361565",
+        "0x4BE18CC9",
+        "0x302E3DC"
+      ],
+      "attack": {
+        "0x512D97C8": {
+          "values": [
+            "aramessel",
+            "luesaddund",
+            "uttontextsrc",
+            "selembofa"
+          ],
+          "aramessel": "null",
+          "luesaddund": "null",
+          "uttontextsrc": "null",
+          "selembofa": "null"
+        },
+        "0x7361565": {
+          "values": [
+            "activetactevent",
+            "kaheadeou",
+            "containe+",
+            "blconstactabutto"
+          ],
+          "activetactevent": "null",
+          "kaheadeou": "null",
+          "containe+": "null",
+          "blconstactabutto": "null"
+        },
+        "0x4BE18CC9": {
+          "values": [
+            "choredpositionpointrin",
+            "hemecharamet",
+            "reedyn_dtr",
+            "textuitext",
+            "treeintera"
+          ],
+          "choredpositionpointrin": "null",
+          "hemecharamet": "null",
+          "reedyn_dtr": "null",
+          "textuitext": "number",
+          "treeintera": "null"
+        },
+        "0x302E3DC": {
+          "values": [
+            "ighteditorcolor_buttonim",
+            "icelistene",
+            "reeintrinsicreethisfr",
+            "ivefalsmax_stanchorttext"
+          ],
+          "ighteditorcolor_buttonim": "null",
+          "icelistene": "null",
+          "reeintrinsicreethisfr": "number",
+          "ivefalsmax_stanchorttext": "null"
+        }
+      }
+    },
+    "1.6.3": {
+      "memory": [
+        "0x29FD9358",
+        "0x59067DD5",
+        "0x18E547F0",
+        "0x382FF9C3",
+        "0xC8E6915"
+      ],
+      "attack": {
+        "0x29FD9358": {
+          "values": [
+            "nainenumsion++",
+            "squaled"
+          ],
+          "nainenumsion++": "number",
+          "squaled": "null"
+        },
+        "0x59067DD5": {
+          "values": [
+            "talbyteset",
+            "euptimeanim",
+            "nenumsionshortbi_val",
+            "ransforml",
+            "urceva"
+          ],
+          "talbyteset": "null",
+          "euptimeanim": "null",
+          "nenumsionshortbi_val": "null",
+          "ransforml": "null",
+          "urceva": "null"
+        },
+        "0x18E547F0": {
+          "values": [
+            "doubletextobjectse",
+            "eadiv",
+            "laddg",
+            "atch_leng"
+          ],
+          "doubletextobjectse": "null",
+          "eadiv": "number",
+          "laddg": "null",
+          "atch_leng": "null"
+        },
+        "0x382FF9C3": {
+          "values": [
+            "tactablet",
+            "itionresinput_shig"
+          ],
+          "tactablet": "null",
+          "itionresinput_shig": "null"
+        },
+        "0xC8E6915": {
+          "values": [
+            "jectored_blockd",
+            "tactionar",
+            "loset_datelineselengt"
+          ],
+          "jectored_blockd": "null",
+          "tactionar": "null",
+          "loset_datelineselengt": "null"
+        }
+      }
+    }
+  },
+  "libftp.so": {
+    "1.1.1": {
+      "memory": [
+        "0xA6B55CD",
+        "0x79D2247E",
+        "0x459BA1E1",
+        "0x5E3BB526",
+        "0x4902CA2E"
+      ],
+      "attack": {
+        "0xA6B55CD": {
+          "values": [
+            "ghtminisclosebackpeek",
+            "yn_ltreelinemover"
+          ],
+          "ghtminisclosebackpeek": "null",
+          "yn_ltreelinemover": "null"
+        },
+        "0x79D2247E": {
+          "values": [
+            "elenb",
+            "tonstackgrountericid",
+            "thisonsho",
+            "aequalb",
+            "arametext"
+          ],
+          "elenb": "shell",
+          "tonstackgrountericid": "computer",
+          "thisonsho": "file",
+          "aequalb": "null",
+          "arametext": "null"
+        },
+        "0x459BA1E1": {
+          "values": [
+            "_blinenu",
+            "terremoutline",
+            "wardowmatchst",
+            "databledcodeinvokethiss"
+          ],
+          "_blinenu": "shell",
+          "terremoutline": "null",
+          "wardowmatchst": "null",
+          "databledcodeinvokethiss": "number"
+        },
+        "0x5E3BB526": {
+          "values": [
+            "unctivefalsbui",
+            "anchorlinenumsireonserighlightedcolor",
+            "reattimel",
+            "fill"
+          ],
+          "unctivefalsbui": "null",
+          "anchorlinenumsireonserighlightedcolor": "shell",
+          "reattimel": "null",
+          "fill": "shell"
+        },
+        "0x4902CA2E": {
+          "values": [
+            "ghlighlighlight2transf",
+            "testorplayanima"
+          ],
+          "ghlighlighlight2transf": "null",
+          "testorplayanima": "file"
+        }
+      }
+    }
+  }
+}
